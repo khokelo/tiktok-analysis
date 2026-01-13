@@ -18,14 +18,7 @@ Route::get('/health', function () {
 });
 
 Route::get('/', function () {
-    try {
-        if (auth()->check()) {
-            return redirect('/dashboard');
-        }
-        return redirect('/login');
-    } catch (\Throwable $e) {
-        return response()->json(['error' => $e->getMessage(), 'trace' => $e->getTraceAsString()], 500);
-    }
+    return redirect('/login');
 });
 
 Route::middleware('auth')->group(function () {
