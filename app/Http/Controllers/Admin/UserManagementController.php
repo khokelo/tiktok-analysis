@@ -2,9 +2,9 @@
 
 namespace App\Http\Controllers\Admin;
 
+use App\Http\Controllers\Controller;
 use App\Models\User;
 use Illuminate\Http\Request;
-use App\Http\Controllers\Controller;
 use Illuminate\Support\Facades\Hash;
 
 class UserManagementController extends Controller
@@ -17,7 +17,7 @@ class UserManagementController extends Controller
         $users = User::with('uploadedFiles')
             ->orderBy('created_at', 'desc')
             ->paginate(15);
-        
+
         return view('admin.users.index', compact('users'));
     }
 
@@ -27,6 +27,7 @@ class UserManagementController extends Controller
     public function show(User $user)
     {
         $user->load('uploadedFiles');
+
         return view('admin.users.show', compact('user'));
     }
 
@@ -73,12 +74,12 @@ class UserManagementController extends Controller
     {
         $validated = $request->validate([
             'name' => 'required|string|max:255',
-            'email' => 'required|email|unique:users,email,' . $user->id,
+            'email' => 'required|email|unique:users,email,'.$user->id,
             'role' => 'required|in:user,admin',
             'password' => 'nullable|string|min:8|confirmed',
         ]);
 
-        if (!empty($validated['password'])) {
+        if (! empty($validated['password'])) {
             $validated['password'] = Hash::make($validated['password']);
         } else {
             unset($validated['password']);
@@ -108,7 +109,7 @@ class UserManagementController extends Controller
                 ->with('success', 'User berhasil dihapus.');
         } catch (\Exception $e) {
             return redirect()->route('admin.users.index')
-                ->with('error', 'Gagal menghapus user: ' . $e->getMessage());
+                ->with('error', 'Gagal menghapus user: '.$e->getMessage());
         }
     }
 

@@ -21,7 +21,7 @@ return new class extends Migration
             $table->integer('row_count')->default(0);
             $table->enum('status', ['pending', 'processed', 'failed'])->default('pending');
             $table->timestamps();
-            
+
             $table->index('user_id');
             $table->index('status');
         });

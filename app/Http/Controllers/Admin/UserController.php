@@ -9,12 +9,15 @@ use Illuminate\Support\Facades\Hash;
 
 class UserController extends Controller
 {
-    public function index() {
+    public function index()
+    {
         $users = User::where('id', '!=', auth()->id())->get(); // Tampilkan user lain kecuali diri sendiri
+
         return view('admin.users.index', compact('users'));
     }
 
-    public function store(Request $request) {
+    public function store(Request $request)
+    {
         $request->validate([
             'name' => 'required|string|max:255',
             'email' => 'required|string|email|unique:users',
@@ -31,8 +34,10 @@ class UserController extends Controller
         return back()->with('success', 'User baru berhasil didaftarkan!');
     }
 
-    public function destroy(User $user) {
+    public function destroy(User $user)
+    {
         $user->delete();
+
         return back()->with('success', 'User berhasil dihapus.');
     }
 }

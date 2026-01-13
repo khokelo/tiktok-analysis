@@ -2,10 +2,10 @@
 
 namespace App\Http\Controllers\Admin;
 
-use App\Models\UploadedFile;
-use App\Models\TiktokSale;
-use Illuminate\Http\Request;
 use App\Http\Controllers\Controller;
+use App\Models\TiktokSale;
+use App\Models\UploadedFile;
+use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Storage;
 
 class FileManagementController extends Controller
@@ -18,7 +18,7 @@ class FileManagementController extends Controller
         $files = UploadedFile::with('user')
             ->orderBy('created_at', 'desc')
             ->paginate(15);
-        
+
         return view('admin.files.index', compact('files'));
     }
 
@@ -31,7 +31,7 @@ class FileManagementController extends Controller
         $relatedSales = TiktokSale::orderBy('created_at', 'desc')
             ->limit(50)
             ->get();
-        
+
         return view('admin.files.show', compact('file', 'relatedSales'));
     }
 
@@ -68,7 +68,7 @@ class FileManagementController extends Controller
                 ->with('success', 'File berhasil dihapus.');
         } catch (\Exception $e) {
             return redirect()->route('admin.files.index')
-                ->with('error', 'Gagal menghapus file: ' . $e->getMessage());
+                ->with('error', 'Gagal menghapus file: '.$e->getMessage());
         }
     }
 
@@ -77,7 +77,7 @@ class FileManagementController extends Controller
      */
     public function download(UploadedFile $file)
     {
-        if (!Storage::disk('public')->exists($file->file_path)) {
+        if (! Storage::disk('public')->exists($file->file_path)) {
             return redirect()->route('admin.files.index')
                 ->with('error', 'File tidak ditemukan.');
         }

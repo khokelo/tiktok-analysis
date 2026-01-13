@@ -2,11 +2,10 @@
 
 namespace App\Http\Controllers;
 
-use Illuminate\Http\Request;
 use App\Models\TiktokSale;
 use App\Models\UploadedFile;
+use Illuminate\Http\Request;
 use League\Csv\Reader;
-use Illuminate\Support\Facades\Storage;
 
 class DashboardController extends Controller
 {
@@ -14,48 +13,48 @@ class DashboardController extends Controller
     {
         // Get all sales
         $sales = TiktokSale::all();
-        
+
         // Get Top 15 categories by GMV for Horizontal Bar Chart
         $top15ByGMV = TiktokSale::selectRaw('campaign, SUM(direct_gmv) as total_gmv, COUNT(*) as count')
             ->groupBy('campaign')
             ->orderByDesc('total_gmv')
             ->limit(15)
             ->get();
-        
+
         // Get data grouped by campaign for Scatter Plot (Customers vs GMV)
         $scatterData = TiktokSale::selectRaw('campaign, AVG(customers) as avg_customers, AVG(direct_gmv) as avg_gmv')
             ->groupBy('campaign')
             ->get();
-        
+
         // Get data for Treemap (Customers size, GMV color)
         $treemapData = TiktokSale::selectRaw('campaign, SUM(customers) as total_customers, SUM(direct_gmv) as total_gmv')
             ->groupBy('campaign')
             ->orderByDesc('total_gmv')
             ->limit(20)
             ->get();
-        
+
         // Get Top 20 categories + Others for Grouped Bar Chart
         $categoryData = TiktokSale::selectRaw('campaign, SUM(direct_gmv) as total_gmv, SUM(customers) as total_customers, COUNT(*) as count')
             ->groupBy('campaign')
             ->orderByDesc('total_gmv')
             ->get();
-        
+
         // Process for Top 20 + Others
         $top20 = $categoryData->take(20);
         $othersGMV = $categoryData->skip(20)->sum('total_gmv');
         $othersCustomers = $categoryData->skip(20)->sum('total_customers');
-        
+
         if ($othersGMV > 0 || $othersCustomers > 0) {
-            $top20->push((object)[
+            $top20->push((object) [
                 'campaign' => 'Others',
                 'total_gmv' => $othersGMV,
                 'total_customers' => $othersCustomers,
-                'count' => $categoryData->skip(20)->count()
+                'count' => $categoryData->skip(20)->count(),
             ]);
         }
-        
+
         $groupedChartData = $top20;
-        
+
         return view('dashboard', compact(
             'sales',
             'top15ByGMV',
@@ -70,17 +69,17 @@ class DashboardController extends Controller
         set_time_limit(300); // 5 menit timeout
 
         $request->validate([
-            'csv_file' => 'required|file|mimes:csv,txt|max:10240'
+            'csv_file' => 'required|file|mimes:csv,txt|max:10240',
         ]);
 
         try {
             $file = $request->file('csv_file');
             $originalName = $file->getClientOriginalName();
-            
+
             // Store file
             $filePath = $file->store('uploads', 'public');
             $fileSize = $file->getSize();
-            
+
             // Parse and insert data
             $csv = Reader::createFromPath($file->getRealPath(), 'r');
             $csv->setHeaderOffset(0);
@@ -92,9 +91,9 @@ class DashboardController extends Controller
             foreach ($csv as $row) {
                 $records[] = [
                     'campaign' => $row['Campaign'] ?? null,
-                    'date' => !empty($row['Date']) ? date('Y-m-d', strtotime($row['Date'])) : null,
+                    'date' => ! empty($row['Date']) ? date('Y-m-d', strtotime($row['Date'])) : null,
                     'time' => $row['Time'] ?? null,
-                    'direct_gmv' => !empty($row['Direct GMV']) ? str_replace(',', '', $row['Direct GMV']) : 0,
+                    'direct_gmv' => ! empty($row['Direct GMV']) ? str_replace(',', '', $row['Direct GMV']) : 0,
                     'items_sold' => $row['Items sold'] ?? 0,
                     'customers' => $row['Customers'] ?? 0,
                     'viewers' => $row['Viewers'] ?? 0,
@@ -111,7 +110,7 @@ class DashboardController extends Controller
             }
 
             // Insert sisa records
-            if (!empty($records)) {
+            if (! empty($records)) {
                 TiktokSale::insert($records);
                 $count += count($records);
             }
@@ -129,8 +128,7 @@ class DashboardController extends Controller
 
             return redirect('/dashboard')->with('success', "Berhasil upload $count data penjualan!");
         } catch (\Exception $e) {
-            return back()->with('error', 'Error: ' . $e->getMessage())->withInput();
+            return back()->with('error', 'Error: '.$e->getMessage())->withInput();
         }
     }
 }
-

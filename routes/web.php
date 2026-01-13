@@ -1,13 +1,13 @@
 <?php
 
-use App\Http\Controllers\Admin\UserManagementController;
+use App\Http\Controllers\Admin\AdminDashboardController;
 use App\Http\Controllers\Admin\FileManagementController;
 use App\Http\Controllers\Admin\SalesManagementController;
-use App\Http\Controllers\Admin\AdminDashboardController;
+use App\Http\Controllers\Admin\UserManagementController;
 use App\Http\Controllers\DashboardController;
 use App\Http\Controllers\SaleController;
-use Illuminate\Support\Facades\Route;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Route;
 
 // Health check endpoint for Railway monitoring
 Route::get('/health', function () {
@@ -31,6 +31,7 @@ Route::get('/', function () {
     if (auth()->check()) {
         return redirect('/dashboard');
     }
+
     return redirect('/login');
 });
 
@@ -42,10 +43,10 @@ Route::middleware('auth')->group(function () {
 Route::middleware(['auth', 'admin'])->group(function () {
     // Admin Dashboard
     Route::get('/admin', [AdminDashboardController::class, 'index'])->name('admin.dashboard');
-    
+
     // Route Sales Import
     Route::post('/import', [SaleController::class, 'store'])->name('sales.import');
-    
+
     // Route Manajemen Sales (Admin)
     Route::get('/admin/sales', [SalesManagementController::class, 'index'])->name('admin.sales.index');
     Route::get('/admin/sales/create', [SalesManagementController::class, 'create'])->name('admin.sales.create');
@@ -55,7 +56,7 @@ Route::middleware(['auth', 'admin'])->group(function () {
     Route::put('/admin/sales/{sale}', [SalesManagementController::class, 'update'])->name('admin.sales.update');
     Route::delete('/admin/sales/{sale}', [SalesManagementController::class, 'destroy'])->name('admin.sales.destroy');
     Route::post('/admin/sales/bulk-delete', [SalesManagementController::class, 'bulkDelete'])->name('admin.sales.bulkDelete');
-    
+
     // Route Manajemen User
     Route::get('/admin/users', [UserManagementController::class, 'index'])->name('admin.users.index');
     Route::get('/admin/users/create', [UserManagementController::class, 'create'])->name('admin.users.create');
@@ -65,7 +66,7 @@ Route::middleware(['auth', 'admin'])->group(function () {
     Route::put('/admin/users/{user}', [UserManagementController::class, 'update'])->name('admin.users.update');
     Route::delete('/admin/users/{user}', [UserManagementController::class, 'destroy'])->name('admin.users.destroy');
     Route::patch('/admin/users/{user}/role', [UserManagementController::class, 'updateRole'])->name('admin.users.updateRole');
-    
+
     // Route Manajemen File
     Route::get('/admin/files', [FileManagementController::class, 'index'])->name('admin.files.index');
     Route::get('/admin/files/{file}', [FileManagementController::class, 'show'])->name('admin.files.show');

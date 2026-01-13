@@ -8,7 +8,7 @@ use Illuminate\Database\Eloquent\Relations\BelongsTo;
 class UploadedFile extends Model
 {
     protected $table = 'uploaded_files';
-    
+
     protected $fillable = [
         'user_id',
         'file_name',
