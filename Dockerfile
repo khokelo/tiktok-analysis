@@ -9,6 +9,9 @@ RUN apt-get update && apt-get install -y \
     libpq-dev \
     libonig-dev \
     libxml2-dev \
+    libsqlite3-dev \
+    zlib1g-dev \
+    libzip-dev \
     zip \
     curl \
     git \
@@ -23,9 +26,9 @@ RUN docker-php-ext-install \
     exif \
     pcntl \
     bcmath \
-    json \
     xml \
-    ctype
+    ctype \
+    zip
 
 # Install Composer
 COPY --from=composer:latest /usr/bin/composer /usr/bin/composer
