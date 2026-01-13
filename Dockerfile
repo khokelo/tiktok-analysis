@@ -59,4 +59,4 @@ EXPOSE 8000
 #     CMD curl -f http://localhost:8000/health || exit 1
 
 # Run artisan and start server
-CMD php artisan serve --host=0.0.0.0 --port=8000
+CMD php artisan config:clear && php artisan route:clear && php artisan cache:clear && php artisan serve --host=0.0.0.0 --port=8000

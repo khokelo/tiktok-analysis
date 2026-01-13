@@ -1,9 +1,13 @@
 <?php
 
-\Illuminate\Support\Facades\Route::get('/test', function () {
+use Illuminate\Support\Facades\Route;
+
+Route::get('/test', function () {
     return response()->json(['status' => 'ok']);
 });
 
-\Illuminate\Support\Facades\Route::get('/', function () {
+Route::get('/', function () {
     return redirect('/login');
 });
+
+require __DIR__.'/auth.php';
