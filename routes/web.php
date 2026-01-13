@@ -1,14 +1,9 @@
 <?php
 
-use Illuminate\Support\Facades\Route;
-
-// Minimal test routes
-Route::get('/test', function () {
-    return response()->json(['status' => 'ok', 'time' => now()]);
+\Illuminate\Support\Facades\Route::get('/test', function () {
+    return response()->json(['status' => 'ok']);
 });
 
-Route::get('/', function () {
+\Illuminate\Support\Facades\Route::get('/', function () {
     return redirect('/login');
 });
-
-// require __DIR__.'/auth.php';
