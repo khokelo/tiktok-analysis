@@ -5,12 +5,9 @@
   },
   "deploy": {
     "numReplicas": 1,
-    "startCommand": "php artisan cache:clear && php artisan config:cache && php artisan route:cache && php artisan migrate --force && php artisan serve --host=0.0.0.0 --port=$PORT",
-    "healthcheckPath": "/health",
-    "healthcheckTimeout": 30,
-    "healthcheckInterval": 30,
+    "startCommand": "php artisan serve --host=0.0.0.0 --port=$PORT",
     "restartPolicyType": "on_failure",
-    "restartPolicyMaxRetries": 5
+    "restartPolicyMaxRetries": 3
   },
   "variables": {
     "APP_ENV": "production",
