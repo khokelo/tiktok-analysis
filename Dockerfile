@@ -21,6 +21,7 @@ RUN apt-get update && apt-get install -y \
 # Install PHP extensions
 RUN docker-php-ext-install \
     pdo_mysql \
+    pdo_pgsql \
     pdo_sqlite \
     mbstring \
     exif \
@@ -58,8 +59,8 @@ HEALTHCHECK --interval=30s --timeout=10s --start-period=60s --retries=3 \
     CMD curl -f http://localhost:8000/health || exit 1
 
 # Run artisan and start server
-CMD php artisan cache:clear && \
+CMD sh -c 'php artisan cache:clear && \
     php artisan config:cache && \
     php artisan route:cache && \
     php artisan migrate --force && \
-    php artisan serve --host=0.0.0.0 --port=8000
+    php artisan serve --host=0.0.0.0 --port=8000'

@@ -7,7 +7,7 @@
     "numReplicas": 1,
     "startCommand": "php artisan cache:clear && php artisan config:cache && php artisan route:cache && php artisan migrate --force && php artisan serve --host=0.0.0.0 --port=$PORT",
     "healthcheckPath": "/health",
-    "healthcheckTimeout": 15,
+    "healthcheckTimeout": 30,
     "healthcheckInterval": 30,
     "restartPolicyType": "on_failure",
     "restartPolicyMaxRetries": 5
