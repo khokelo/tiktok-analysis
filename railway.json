@@ -1,7 +1,7 @@
 {
   "$schema": "https://railway.app/railway.schema.json",
   "build": {
-    "builder": "nixpacks"
+    "builder": "dockerfile"
   },
   "deploy": {
     "numReplicas": 1,
@@ -11,5 +11,11 @@
     "healthcheckInterval": 30,
     "restartPolicyType": "on_failure",
     "restartPolicyMaxRetries": 5
+  },
+  "variables": {
+    "APP_ENV": "production",
+    "APP_DEBUG": "false",
+    "DB_CONNECTION": "pgsql",
+    "LOG_LEVEL": "warning"
   }
 }
