@@ -5,14 +5,16 @@
   },
   "deploy": {
     "numReplicas": 1,
-    "startCommand": "php artisan serve --host=0.0.0.0 --port=8000",
+    "startCommand": "php artisan serve --host=0.0.0.0 --port=$PORT",
     "restartPolicyType": "on_failure",
-    "restartPolicyMaxRetries": 3
+    "restartPolicyMaxRetries": 3,
+    "healthcheckPath": "/",
+    "healthcheckInterval": 30,
+    "healthcheckTimeout": 10
   },
   "variables": {
     "APP_ENV": "production",
     "APP_DEBUG": "false",
-    "DB_CONNECTION": "pgsql",
     "LOG_LEVEL": "warning"
   }
 }
