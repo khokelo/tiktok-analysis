@@ -17,6 +17,24 @@ Route::get('/health', function () {
     ]);
 });
 
+// Diagnostic endpoint - shows actual errors
+Route::get('/diag', function () {
+    $info = [
+        'app_env' => env('APP_ENV'),
+        'app_debug' => env('APP_DEBUG'),
+        'app_key_set' => !empty(env('APP_KEY')),
+    ];
+    
+    try {
+        $info['db_connection'] = DB::connection()->getName();
+        $info['db_tables'] = DB::select('SHOW TABLES');
+    } catch (\Throwable $e) {
+        $info['db_error'] = $e->getMessage();
+    }
+    
+    return response()->json($info);
+});
+
 Route::get('/', function () {
     return redirect('/login');
 });
