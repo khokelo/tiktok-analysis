@@ -54,9 +54,12 @@ RUN chown -R www-data:www-data /var/www/html \
 EXPOSE 8000
 
 # Health check
-HEALTHCHECK --interval=30s --timeout=10s --start-period=40s --retries=3 \
+HEALTHCHECK --interval=30s --timeout=10s --start-period=60s --retries=3 \
     CMD curl -f http://localhost:8000/health || exit 1
 
 # Run artisan and start server
-CMD php artisan migrate --force && \
+CMD php artisan cache:clear && \
+    php artisan config:cache && \
+    php artisan route:cache && \
+    php artisan migrate --force && \
     php artisan serve --host=0.0.0.0 --port=8000
