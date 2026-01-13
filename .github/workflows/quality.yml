@@ -1,0 +1,60 @@
+name: Code Quality Checks
+
+on:
+  push:
+    branches:
+      - main
+      - master
+      - develop
+  pull_request:
+    branches:
+      - main
+      - master
+      - develop
+
+jobs:
+  code-quality:
+    runs-on: ubuntu-latest
+    name: Code Quality Analysis
+
+    steps:
+      - uses: actions/checkout@v3
+
+      - name: Setup PHP
+        uses: shivammathur/setup-php@v2
+        with:
+          php-version: 8.2
+          tools: phpstan, pint
+
+      - name: Install PHP dependencies
+        run: composer install -q --no-ansi --no-interaction --no-scripts --no-progress --prefer-dist
+
+      - name: Run PHP linting
+        run: pint --test --verbose
+
+      - name: Run static analysis
+        run: phpstan analyse --no-progress
+
+      - name: Check code style
+        run: php artisan pint --test || true
+
+  frontend-quality:
+    runs-on: ubuntu-latest
+    name: Frontend Quality Analysis
+
+    steps:
+      - uses: actions/checkout@v3
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v3
+        with:
+          node-version: '18'
+
+      - name: Install dependencies
+        run: npm install
+
+      - name: Run ESLint
+        run: npm run lint || true
+
+      - name: Build frontend
+        run: npm run build

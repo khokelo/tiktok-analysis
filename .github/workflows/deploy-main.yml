@@ -1,0 +1,108 @@
+name: Deploy to Railway
+
+on:
+  push:
+    branches:
+      - main
+      - master
+  pull_request:
+    branches:
+      - main
+      - master
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    name: Test Laravel Application
+
+    services:
+      mysql:
+        image: mysql:8.0
+        env:
+          MYSQL_ALLOW_EMPTY_PASSWORD: 'yes'
+          MYSQL_DATABASE: tiktok_analysis_test
+        options: >-
+          --health-cmd="mysqladmin ping"
+          --health-interval=10s
+          --health-timeout=5s
+          --health-retries=3
+        ports:
+          - 3306:3306
+
+    steps:
+      - uses: actions/checkout@v3
+
+      - name: Setup PHP
+        uses: shivammathur/setup-php@v2
+        with:
+          php-version: 8.2
+          extensions: dom, curl, libxml, mbstring, zip, pcntl, pdo, mysql, sqlite, pdo_mysql, pdo_sqlite, bcmath, soap, intl, gd, exif, iconv, imagick
+          coverage: xdebug
+
+      - name: Install Node.js dependencies
+        run: npm install
+
+      - name: Build Frontend Assets
+        run: npm run build
+
+      - name: Copy .env
+        run: php -r "file_exists('.env') || copy('.env.example', '.env');"
+
+      - name: Install PHP dependencies
+        run: composer install -q --no-ansi --no-interaction --no-scripts --no-progress --prefer-dist
+
+      - name: Generate application key
+        run: php artisan key:generate
+
+      - name: Create SQLite Database
+        run: |
+          mkdir -p database
+          touch database/database.sqlite
+
+      - name: Run migrations
+        run: php artisan migrate --env=testing --database=sqlite
+
+      - name: Run tests
+        run: php artisan test --no-coverage --parallel --processes=4
+
+      - name: Run lint checks
+        run: npm run lint || true
+
+      - name: Upload coverage to Codecov
+        if: always()
+        uses: codecov/codecov-action@v3
+        with:
+          files: ./coverage.xml
+
+  deploy:
+    needs: test
+    runs-on: ubuntu-latest
+    name: Deploy to Railway
+    if: github.ref == 'refs/heads/main' && github.event_name == 'push'
+
+    steps:
+      - uses: actions/checkout@v3
+
+      - name: Deploy to Railway
+        uses: railway-app/cli-action@v1
+        with:
+          token: ${{ secrets.RAILWAY_TOKEN }}
+          service: tiktok-analysis
+          environment: production
+
+      - name: Health Check
+        run: |
+          sleep 30
+          curl -f -H "Accept: application/json" "${{ secrets.RAILWAY_APP_URL }}/health" || exit 1
+
+      - name: Notify deployment success
+        if: success()
+        uses: actions/github-script@v6
+        with:
+          script: |
+            github.rest.issues.createComment({
+              issue_number: context.issue.number,
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              body: '✅ Deployment to Railway successful!\n\nApp URL: ${{ secrets.RAILWAY_APP_URL }}'
+            })
