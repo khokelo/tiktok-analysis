@@ -11,19 +11,9 @@ use Illuminate\Support\Facades\Route;
 
 // Health check endpoint for Railway monitoring
 Route::get('/health', function () {
-    try {
-        DB::connection()->getPdo();
-        $databaseStatus = 'connected';
-    } catch (\Exception $e) {
-        $databaseStatus = 'disconnected';
-    }
-
     return response()->json([
-        'status' => 'healthy',
+        'status' => 'ok',
         'timestamp' => now()->toIso8601String(),
-        'database' => $databaseStatus,
-        'app_name' => config('app.name'),
-        'environment' => app()->environment(),
     ]);
 });
 
