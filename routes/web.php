@@ -66,4 +66,19 @@ Route::middleware(['auth', 'admin'])->group(function () {
     Route::post('/admin/files/bulk-delete', [FileManagementController::class, 'bulkDelete'])->name('admin.files.bulkDelete');
 });
 
+// Debug endpoint
+Route::get('/debug/info', function () {
+    return response()->json([
+        'app_env' => env('APP_ENV'),
+        'app_debug' => env('APP_DEBUG'),
+        'database' => [
+            'connection' => DB::connection()->getName(),
+            'host' => env('DB_HOST'),
+            'database' => env('DB_DATABASE'),
+        ],
+        'tables' => DB::select('SHOW TABLES'),
+        'users_count' => DB::table('users')->count(),
+    ]);
+});
+
 require __DIR__.'/auth.php';
