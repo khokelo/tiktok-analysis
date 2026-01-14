@@ -1,4 +1,4 @@
-# 🎯 EXECUTIVE SUMMARY
+ # 🎯 EXECUTIVE SUMMARY
 
 **TikTok Analysis Application - Complete Setup**
 
